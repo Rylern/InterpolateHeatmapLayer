@@ -14,7 +14,7 @@ Except a JavaScript pre-processing step, all computation is made with WebGL shad
 
 ## Examples
 
-A live demo showing the global temperature is available here (LINK). This project is described here (LINK).
+A live demo showing the global temperature is available here (LINK), described here (LINK).
 
 ## Install
 
@@ -30,7 +30,7 @@ A live demo showing the global temperature is available here (LINK). This projec
 
 * Browser:
 
-  * Copy the interpolateHeatmapLayer.js file (LINK) to your project.
+  * Copy the [interpolateHeatmapLayer.js](https://github.com/Rylern/InterpolateHeatmapLayer/blob/main/dist/interpolateHeatmapLayer.js) file to your project.
 
   * Import the library before the script using it:
 
@@ -111,30 +111,25 @@ The `interpolateHeatmapLayer.create()` function has the following parameters:
 The color is computed using the [Inverse Distance Weighting](https://en.wikipedia.org/wiki/Inverse_distance_weighting) (IDW) algorithm:
 
 Let:
-$$
-[(x_1, u1), ..., (x_N, u_N)]
-$$
+
+![equation](https://latex.codecogs.com/gif.latex?%5B%28x_1%2C%20u1%29%2C%20...%2C%20%28x_N%2C%20u_N%29%5D)
+
 be *N* known data points. We want to find a continuous and once differentiable function:
-$$
-u(x): x \rightarrow \R
-$$
+
+![equation](https://latex.codecogs.com/gif.latex?u%28x%29%3A%20x%20%5Crightarrow%20R)
+
 such as:
-$$
-\forall i \in [1, N], u(x_i) = u_i
-$$
+
+![equation](https://latex.codecogs.com/gif.latex?%5Cforall%20i%20%5Cin%20%5B1%2C%20N%5D%2C%20u%28x_i%29%20%3D%20u_i)
+
 The basic form of the IDW is:
-$$
-u(x) = \left\{
-    \begin{array}{ll}
-        \frac{\sum_{i=1}^{N} \omega_i u_i}{\sum_{i=1}^{N} \omega_i} & \mbox{if } \forall i \in [1, N], d(x, x_i) \neq 0 \\
-        u_i & \mbox{else.}
-    \end{array}
-\right.
-$$
+
+![equation](https://latex.codecogs.com/gif.latex?u%28x%29%20%3D%20%5Cleft%5C%7B%20%5Cbegin%7Barray%7D%7Bll%7D%20%5Cfrac%7B%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20%5Comega_i%20u_i%7D%7B%5Csum_%7Bi%3D1%7D%5E%7BN%7D%20%5Comega_i%7D%20%26%20%5Cmbox%7Bif%20%7D%20%5Cforall%20i%20%5Cin%20%5B1%2C%20N%5D%2C%20d%28x%2C%20x_i%29%20%5Cneq%200%20%5C%5C%20u_i%20%26%20%5Cmbox%7Belse.%7D%20%5Cend%7Barray%7D%20%5Cright.)
+
 where
-$$
-\omega_i(x) = \frac{1}{d(x, x_i)^p}
-$$
+
+![equation](https://latex.codecogs.com/gif.latex?%5Comega_i%28x%29%20%3D%20%5Cfrac%7B1%7D%7Bd%28x%2C%20x_i%29%5Ep%7D)
+
 In WebGL:
 
 * First, we render *N* textures. Each fragment of each texture contains *wi\*ui* in its red channel, and *wi* in its green channel.
