@@ -14,7 +14,7 @@ Except a JavaScript pre-processing step, all computation is made with WebGL shad
 
 ## Examples
 
-A live demo showing the global temperature is available here (LINK), described here (LINK).
+A live demo showing the global temperature is available [here](https://rylern.github.io/TemperatureMap/), described [here](https://github.com/Rylern/TemperatureMap).
 
 ## Install
 
@@ -42,7 +42,7 @@ A live demo showing the global temperature is available here (LINK), described h
     </body>
     ```
 
-  * Create the Mapbox map and add the layer created by `interpolateHeatmapLayer()`:
+  * Create the Mapbox map and add the layer created by `interpolateHeatmapLayer.create()`:
 
   ```javascript
   // map.js
@@ -67,18 +67,16 @@ The `interpolateHeatmapLayer.create()` function has the following parameters:
 * `points`: An array of points, each point being an object containing a latitude `lat`, a longitude `lon`, and a value `val`. Example:
 
   ```javascript
-  points = [
-  	{
-  		lat: 62.470663,
-  		lon: 6.176846,
-          val: 16
-  	},
-      {
-  		lat: 48.094903,
-  		lon: -1.371596,
-          val: 20
-  	}
-  ];
+  points = [{
+    lat: 62.470663,
+    lon: 6.176846,
+    val: 16
+  },
+  {
+    lat: 48.094903,
+    lon: -1.371596,
+    val: 20
+  }];
   ```
 
   Since Mapbox uses the Web Mercator projection that projects the poles at infinity, remember to define the latitude within -85° and 85°. Default value: `[]`.
@@ -101,7 +99,7 @@ The `interpolateHeatmapLayer.create()` function has the following parameters:
 
   ```glsl
   vec3 valueToColor(float value) {
-                  return vec3(max((value-0.5)*2.0, 0.0), 1.0 - 2.0*abs(value - 0.5), max((0.5-value)*2.0, 0.0));
+    return vec3(max((value-0.5)*2.0, 0.0), 1.0 - 2.0*abs(value - 0.5), max((0.5-value)*2.0, 0.0));
   }
   ```
 
