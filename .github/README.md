@@ -18,16 +18,6 @@ A live demo showing the global temperature is available [here](https://rylern.gi
 
 ## Install
 
-* NPM:
-
-  ```bash
-  npm install interpolateHeatmapLayer
-  ```
-
-  ```javascript
-  //TODO
-  ```
-
 * Browser:
 
   * Copy the [interpolateHeatmapLayer.js](https://github.com/Rylern/InterpolateHeatmapLayer/blob/main/dist/interpolateHeatmapLayer.js) file to your project.
@@ -46,6 +36,29 @@ A live demo showing the global temperature is available [here](https://rylern.gi
 
   ```javascript
   // map.js
+  
+  const map = (window.map = new mapboxgl.Map({
+      container: 'map',
+      style: 'mapbox://styles/mapbox/light-v10'
+  }));
+      
+  map.on('load', () => {
+      const layer = interpolateHeatmapLayer.create({
+          // parameters here
+      });
+      map.addLayer(layer);
+  });
+  ```
+
+
+* NPM:
+
+  ```bash
+  npm install interpolateheatmaplayer
+  ```
+
+  ```javascript
+  const interpolateHeatmapLayer = require('interpolateheatmaplayer');
   
   const map = (window.map = new mapboxgl.Map({
       container: 'map',
