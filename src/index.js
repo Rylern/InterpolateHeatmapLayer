@@ -11,6 +11,7 @@ export function create(options) {
         framebufferFactor: 0.3,
         points: [],
         roi: [],
+        threshold: 0,
         valueToColor: `
             vec3 valueToColor(float value) {
                 return vec3(max((value-0.5)*2.0, 0.0), 1.0 - 2.0*abs(value - 0.5), max((0.5-value)*2.0, 0.0));
@@ -53,12 +54,18 @@ export function create(options) {
                 uniform sampler2D u_ComputationTexture;
                 uniform vec2 u_ScreenSize;
                 uniform float u_Opacity;
+                uniform float u_Threshold;
+                uniform float u_Average;
 
                 void main(void) {
                     vec4 data = texture2D(u_ComputationTexture, vec2(gl_FragCoord.x/u_ScreenSize.x, gl_FragCoord.y/u_ScreenSize.y));
                     float u = data.x/data.y;
                     gl_FragColor.rgb = valueToColor(u);
-                    gl_FragColor.a = u_Opacity;
+                    if (abs(u - u_Average) < u_Threshold) {
+                        gl_FragColor.a = 0.;
+                    } else {
+                        gl_FragColor.a = u_Opacity;
+                    }
                 }
             `;
             const computationVertexSource = `
@@ -111,7 +118,9 @@ export function create(options) {
             this.uComputationTexture = gl.getUniformLocation(this.drawProgram, 'u_ComputationTexture');
             this.uScreenSizeDraw = gl.getUniformLocation(this.drawProgram, 'u_ScreenSize');
             this.uOpacity = gl.getUniformLocation(this.drawProgram, 'u_Opacity');
-            if (this.aPositionDraw < 0 || !this.uMatrixDraw || !this.uComputationTexture || !this.uScreenSizeDraw || !this.uOpacity) {
+            this.uThreshold = gl.getUniformLocation(this.drawProgram, 'u_Threshold');
+            this.uAverage = gl.getUniformLocation(this.drawProgram, 'u_Average');
+            if (this.aPositionDraw < 0 || !this.uMatrixDraw || !this.uComputationTexture || !this.uScreenSizeDraw || !this.uOpacity || !this.uThreshold || !this.uAverage) {
                 throw("WebGL error: Failed to get the storage location of drawing variable");
             }
 
@@ -174,9 +183,12 @@ export function create(options) {
             });
             minValue = minValue < _options.minValue ? minValue : _options.minValue;
             maxValue = maxValue > _options.maxValue ? maxValue : _options.maxValue;
+            this.average = 0;
             this.points.forEach(point => {
                 point[2] = (point[2] - minValue) / (maxValue - minValue);
+                this.average += point[2];
             });
+            this.average /= this.points.length;
 
             this.resizeFramebuffer = () => {
                 this.framebufferWidth = Math.ceil(this.canvas.width * _options.framebufferFactor);
@@ -250,6 +262,8 @@ export function create(options) {
             gl.uniform1i(this.uComputationTexture, 0);
             gl.uniform2f(this.uScreenSizeDraw, this.canvas.width, this.canvas.height);
             gl.uniform1f(this.uOpacity, _options.opacity);
+            gl.uniform1f(this.uThreshold, _options.threshold);
+            gl.uniform1f(this.uAverage, this.average);
     
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
             gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.indicesBuffer);
