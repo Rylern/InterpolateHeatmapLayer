@@ -15,6 +15,11 @@ export function create(options) {
             vec3 valueToColor(float value) {
                 return vec3(max((value-0.5)*2.0, 0.0), 1.0 - 2.0*abs(value - 0.5), max((0.5-value)*2.0, 0.0));
             }
+        `,
+        valueToColor4: `
+            vec4 valueToColor4(float value, float defaultOpacity) {
+                return vec4(valueToColor(value), defaultOpacity);
+            }
         `
     }
 
@@ -49,6 +54,7 @@ export function create(options) {
                 precision highp float;
 
                 ${_options['valueToColor']}
+                ${_options['valueToColor4']}
 
                 uniform sampler2D u_ComputationTexture;
                 uniform vec2 u_ScreenSize;
@@ -57,8 +63,9 @@ export function create(options) {
                 void main(void) {
                     vec4 data = texture2D(u_ComputationTexture, vec2(gl_FragCoord.x/u_ScreenSize.x, gl_FragCoord.y/u_ScreenSize.y));
                     float u = data.x/data.y;
-                    gl_FragColor.rgb = valueToColor(u);
-                    gl_FragColor.a = u_Opacity;
+                    vec4 color4 = valueToColor4(u, u_Opacity);
+                    gl_FragColor.rgb = color4.xyz;
+                    gl_FragColor.a = color4.w;
                 }
             `;
             const computationVertexSource = `
