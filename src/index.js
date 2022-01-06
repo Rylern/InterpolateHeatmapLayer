@@ -63,9 +63,8 @@ export function create(options) {
                 void main(void) {
                     vec4 data = texture2D(u_ComputationTexture, vec2(gl_FragCoord.x/u_ScreenSize.x, gl_FragCoord.y/u_ScreenSize.y));
                     float u = data.x/data.y;
-                    vec4 color4 = valueToColor4(u, u_Opacity);
-                    gl_FragColor.rgb = color4.xyz;
-                    gl_FragColor.a = color4.w;
+                    u += u_Opacity*0.00000001;      // force WebGL to use u_Opacity. This might not be the case depending on valueToColor4
+                    gl_FragColor = valueToColor4(u, u_Opacity);
                 }
             `;
             const computationVertexSource = `
