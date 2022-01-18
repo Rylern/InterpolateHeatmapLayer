@@ -113,7 +113,7 @@ The `interpolateHeatmapLayer.create()` function has the following parameters:
   ```javascript
   const layer = create({
       points: points
-      threshold: 0.1
+      averageThreshold: 0.1
   });
   ```
 
