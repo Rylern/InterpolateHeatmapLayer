@@ -11,10 +11,15 @@ export function create(options) {
         framebufferFactor: 0.3,
         points: [],
         roi: [],
-        threshold: 0,
+        averageThreshold: 0,
         valueToColor: `
             vec3 valueToColor(float value) {
                 return vec3(max((value-0.5)*2.0, 0.0), 1.0 - 2.0*abs(value - 0.5), max((0.5-value)*2.0, 0.0));
+            }
+        `,
+        valueToColor4: `
+            vec4 valueToColor4(float value, float defaultOpacity) {
+                return vec4(valueToColor(value), defaultOpacity);
             }
         `
     }
@@ -50,22 +55,25 @@ export function create(options) {
                 precision highp float;
 
                 ${_options['valueToColor']}
+                ${_options['valueToColor4']}
 
                 uniform sampler2D u_ComputationTexture;
                 uniform vec2 u_ScreenSize;
                 uniform float u_Opacity;
-                uniform float u_Threshold;
+                uniform float u_AverageThreshold;
                 uniform float u_Average;
 
                 void main(void) {
                     vec4 data = texture2D(u_ComputationTexture, vec2(gl_FragCoord.x/u_ScreenSize.x, gl_FragCoord.y/u_ScreenSize.y));
                     float u = data.x/data.y;
-                    gl_FragColor.rgb = valueToColor(u);
-                    if (abs(u - u_Average) < u_Threshold) {
-                        gl_FragColor.a = 0.;
+                    float opacity = u_Opacity;
+                    if (abs(u - u_Average) < u_AverageThreshold) {
+                        opacity = 0.;
                     } else {
-                        gl_FragColor.a = u_Opacity;
+                        opacity = u_Opacity;
                     }
+                    u += opacity*0.00000001;      // force WebGL to use u_Opacity, u_AverageThreshold, and u_Average. This might not be the case depending on valueToColor4
+                    gl_FragColor = valueToColor4(u, opacity);
                 }
             `;
             const computationVertexSource = `
@@ -118,9 +126,9 @@ export function create(options) {
             this.uComputationTexture = gl.getUniformLocation(this.drawProgram, 'u_ComputationTexture');
             this.uScreenSizeDraw = gl.getUniformLocation(this.drawProgram, 'u_ScreenSize');
             this.uOpacity = gl.getUniformLocation(this.drawProgram, 'u_Opacity');
-            this.uThreshold = gl.getUniformLocation(this.drawProgram, 'u_Threshold');
+            this.uAverageThreshold = gl.getUniformLocation(this.drawProgram, 'u_AverageThreshold');
             this.uAverage = gl.getUniformLocation(this.drawProgram, 'u_Average');
-            if (this.aPositionDraw < 0 || !this.uMatrixDraw || !this.uComputationTexture || !this.uScreenSizeDraw || !this.uOpacity || !this.uThreshold || !this.uAverage) {
+            if (this.aPositionDraw < 0 || !this.uMatrixDraw || !this.uComputationTexture || !this.uScreenSizeDraw || !this.uOpacity || !this.uAverageThreshold || !this.uAverage) {
                 throw("WebGL error: Failed to get the storage location of drawing variable");
             }
 
@@ -262,7 +270,7 @@ export function create(options) {
             gl.uniform1i(this.uComputationTexture, 0);
             gl.uniform2f(this.uScreenSizeDraw, this.canvas.width, this.canvas.height);
             gl.uniform1f(this.uOpacity, _options.opacity);
-            gl.uniform1f(this.uThreshold, _options.threshold);
+            gl.uniform1f(this.uAverageThreshold, _options.averageThreshold);
             gl.uniform1f(this.uAverage, this.average);
     
             gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);

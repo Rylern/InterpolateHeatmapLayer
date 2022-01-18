@@ -108,6 +108,17 @@ The `interpolateHeatmapLayer.create()` function has the following parameters:
 
 * `roi`: region of interest, the layer will only be displayed inside that area. It's a list of coordinates with the same format as `points` (without the `val` attribute). If the list is empty, the entire map is the region of interest. Default value: `[]`.
 
+* `averageThreshold`: for each point of the map, if the distance between the point's value and the average value of all points is below this threshold, the associated color will be transparent. The values and the average are scaled between 0 and 1 when computing their distance, so `averageThreshold` is a value between 0 and 1. For example, if you have `points` with values [0, 5, 10], and you create the layer with these parameters:
+
+  ```javascript
+  const layer = create({
+      points: points
+      threshold: 0.1
+  });
+  ```
+
+  Then all points with values between 4 and 6 will be transparent.
+
 * `valueToColor`: [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) function (passed as a string) that map a value to the heatmap color. By default, a low value is colored blue, a medium green and a high red. This parameter allows you to change this behavior. The function must be named `valueToColor` with a `float` parameter (which will take values between 0 and 1), and must return a ` vec3` (with each component between 0 and 1). Default value:
 
   ```glsl
@@ -116,6 +127,16 @@ The `interpolateHeatmapLayer.create()` function has the following parameters:
   }
   ```
 
+* `valueToColor4`: Same as `valueToColor`, but with alpha channel support. The function name and signature must be defined as:
+
+  ```vec4 valueToColor4(float value, float defaultOpacity)```
+  
+  Default value:
+  ```glsl
+  vec4 valueToColor4(float value, float defaultOpacity) {
+      return vec4(valueToColor(value), defaultOpacity);
+  }
+  ```
 
 ## Technical explanation
 
@@ -148,4 +169,3 @@ In WebGL:
 * We pass this texture to the shader rendering the heatmap, convert u(x) to a color, and finally display this color.
 
 The size of the computation textures is the size of the rendering texture multiplied by the `framebufferFactor`. This factor can be below 0.5 without any real visual consequences. If the user has defined a region of interest and uses a `framebufferFactor` < 1, visual artifacts appear at the edge of the heatmap. To prevent this, the rendering texture takes the whole screen size if `framebufferFactor` < 1.
-
