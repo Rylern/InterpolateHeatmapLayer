@@ -94,7 +94,7 @@ The `interpolateHeatmapLayer.create()` function has one object parameter contain
 
   Since Mapbox uses the Web Mercator projection that projects the poles at infinity, remember to define the latitude within -85° and 85°. Default value: `[]`.
 
-* `layerID`: string defining the unique [Mapbox layer](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#id) name. Default value: `''`.
+* `layerId`: string defining the unique [Mapbox layer](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#id) name. Default value: `''`.
 
 * `opacity`: number between 0 and 1 describing the transparency of the layer. Default value: `0.5`.
 
