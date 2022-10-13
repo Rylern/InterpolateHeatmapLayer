@@ -11,5 +11,13 @@ module.exports = {
         },
         globalObject: 'this'
     },
-    mode: 'production'
+    mode: 'production',
+    module: {
+        rules: [
+            {
+                test: /\.glsl$/,
+                loader: 'webpack-glsl-loader'
+            }
+        ]
+    }
 };

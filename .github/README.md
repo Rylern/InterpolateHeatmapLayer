@@ -1,6 +1,6 @@
 # InterpolateHeatmapLayer
 
-InterpolateHeatmapLayer is a minimalist JavaScript library for rendering temperature maps (or interpolate heatmaps) with [Mapbox GJ JS](https://docs.mapbox.com/mapbox-gl-js/guides/). This library was greatly inspired by the [temperature-map-gl](https://github.com/ham-systems/temperature-map-gl) library, and depends on [Earcut](https://github.com/mapbox/earcut).
+InterpolateHeatmapLayer is a JavaScript library for rendering temperature maps (or interpolate heatmaps) with [Mapbox GJ JS](https://docs.mapbox.com/mapbox-gl-js/guides/). This library was inspired by the [temperature-map-gl](https://github.com/ham-systems/temperature-map-gl) library and depends on [Earcut](https://github.com/mapbox/earcut).
 
 Currently, Mapbox provides a heatmap layer that represent the **density** of points in an area, like on this picture:
 
@@ -75,9 +75,9 @@ A live demo showing the global temperature is available [here](https://rylern.gi
 
 ## Usage
 
-The `interpolateHeatmapLayer.create()` function has the following parameters:
+The `interpolateHeatmapLayer.create()` function has one object parameter containing the following properties:
 
-* `points`: An array of points, each point being an object containing a latitude `lat`, a longitude `lon`, and a value `val`. Example:
+* `points`: An list of points, each point being an object containing a latitude `lat`, a longitude `lon`, and a value `val`. Example:
 
   ```javascript
   points = [{
@@ -94,24 +94,26 @@ The `interpolateHeatmapLayer.create()` function has the following parameters:
 
   Since Mapbox uses the Web Mercator projection that projects the poles at infinity, remember to define the latitude within -85° and 85°. Default value: `[]`.
 
-* `layerID`: unique [Mapbox layer](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#id) name. Default value: `''`.
+* `layerID`: string defining the unique [Mapbox layer](https://docs.mapbox.com/mapbox-gl-js/style-spec/layers/#id) name. Default value: `''`.
 
-* `opacity`: a number between 0 and 1 describing the transparency of the color. Default value: `0.5`.
+* `opacity`: number between 0 and 1 describing the transparency of the layer. Default value: `0.5`.
 
-* `minValue`: define the value corresponding to the blue color. When it's not defined, the lowest value of `points` is represented by the blue color. If some value of `points` is lower than `minValue`, `minValue` takes this value. Default value: `Infinity`.
+* `minValue`: number defining the value corresponding to the blue color. When it's not defined, the lowest value of `points` is represented by the blue color. If some value of `points` is lower than `minValue`, `minValue` takes this value. Default value: `Infinity`.
 
 * `maxValue` same, but for the red color. Default value: `-Infinity`.
 
-* `framebufferFactor`: number between 0 and 1. In short, if the framebuffer factor is around 0, the computation will be faster but less accurate. Take a look at the technical explanation part if you want to know what exactly this parameter is. Default value: `0.3`.
+* `p`: number affecting the computation of the color. A high value makes the color uniform around each point. Take a look at the form of the IDW in the technical explanation part if you want to know more. Default value: `3`.
 
-* `p`: a factor affecting the computation of the color. A high value makes the color uniform around each point. Once again, take a look at the technical explanation part if you want to know more. Default value: `3`.
+* `pointRadius`: number defining a radius (in meters). The color will only appear within circles of radius `pointRadius` centered at the points defined in `points`. If `pointsRadius <= 0`, this parameter is not taken into account. Default value: `0`.
 
-* `roi`: region of interest, the layer will only be displayed inside that area. It's a list of coordinates with the same format as `points` (without the `val` attribute). If the list is empty, the entire map is the region of interest. Default value: `[]`.
+* `fasterPointRadius`: boolean indicating if a faster algorithm should be used when defining a `pointRadius > 0`. Due to precision issues, this parameter creates bad visualizations if `pointRadius < 500`. Default value: `false`.
 
-* `averageThreshold`: for each point of the map, if the distance between the point's value and the average value of all points is below this threshold, the associated color will be transparent. The values and the average are scaled between 0 and 1 when computing their distance, so `averageThreshold` is a value between 0 and 1. For example, if you have `points` with values [0, 5, 10], and you create the layer with these parameters:
+* `roi`: list of coordinates with the same format as `points` (without the `val` attribute). It defines the region of interest, meaning the layer will only be displayed inside that area. If the list is empty, the entire map is the region of interest. This parameter is not taken into account if `pointRadius > 0`. Default value: `[]`.
+
+* `averageThreshold`: number defining a threshold. For each point of the map, if the distance between the point's value and the average value of all points is below this threshold, the associated color will be transparent. The values and the average are scaled between 0 and 1 when computing their distance, so `averageThreshold` is a value between 0 and 1. For example, if you have `points` with values [0, 5, 10], and you create the layer with these parameters:
 
   ```javascript
-  const layer = create({
+  const layer = interpolateHeatmapLayer.create({
       points: points
       averageThreshold: 0.1
   });
@@ -119,7 +121,9 @@ The `interpolateHeatmapLayer.create()` function has the following parameters:
 
   Then all points with values between 4 and 6 will be transparent.
 
-* `valueToColor`: [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) function (passed as a string) that map a value to the heatmap color. By default, a low value is colored blue, a medium green and a high red. This parameter allows you to change this behavior. The function must be named `valueToColor` with a `float` parameter (which will take values between 0 and 1), and must return a ` vec3` (with each component between 0 and 1). Default value:
+* `framebufferFactor`: number between 0 and 1. In short, if the framebuffer factor is around 0, the computation will be faster but with a lower resolution. Take a look at the technical explanation part if you want to know exactly what this parameter is. Default value: `0.3`.
+
+* `valueToColor`: [GLSL](https://www.khronos.org/opengl/wiki/OpenGL_Shading_Language) function (passed as a string) that maps a value to the layer color. By default, a low value is colored blue, a medium green and a high red. This parameter allows you to change this behavior. The function must be named `valueToColor` with a `float` parameter (which will take values between 0 and 1), and must return a ` vec3` (with each component between 0 and 1). Default value:
 
   ```glsl
   vec3 valueToColor(float value) {
@@ -127,16 +131,23 @@ The `interpolateHeatmapLayer.create()` function has the following parameters:
   }
   ```
 
-* `valueToColor4`: Same as `valueToColor`, but with alpha channel support. The function name and signature must be defined as:
+* `valueToColor4`: Same as `valueToColor`, but with alpha channel support. The function name and signature must be defined as: `vec4 valueToColor4(float value, float defaultOpacity)`. Default value:
 
-  ```vec4 valueToColor4(float value, float defaultOpacity)```
-  
-  Default value:
   ```glsl
   vec4 valueToColor4(float value, float defaultOpacity) {
       return vec4(valueToColor(value), defaultOpacity);
   }
   ```
+
+The `layer` returned by the `interpolateHeatmapLayer.create()` function has also one function: `layer.updatePoints(points)`, in which `points` is an array of points as described above (objects with `lat`, `lon`, and `val` attributes). This function allows you to change the points without creating a new layer. Usage example:
+
+```javascript
+const layer = interpolateHeatmapLayer.create({
+  points: somePoints
+});
+// some code
+layer.updatePoints(newPoints);
+```
 
 ## Technical explanation
 
@@ -164,8 +175,10 @@ where
 
 In WebGL:
 
-* First, we render *N* textures. Each fragment of each texture contains *wi\*ui* in its red channel, and *wi* in its green channel.
-* Then, we use blending with accumulator configuration on these *N* textures. It creates one texture, containing the sum of the *N* textures. Therefore, we can get u(x) for each fragment by dividing the red channel by the green channel.
-* We pass this texture to the shader rendering the heatmap, convert u(x) to a color, and finally display this color.
+* First, we render *N* textures. Each fragment of each texture contains *wi\*ui* in its red channel and *wi* in its green channel. These textures are blended to create one single texture containing the sum of the *N* textures. We can get u(x) for each fragment by dividing the red channel by the green channel.
+* Then, a shader determines which pixels are covered by the layer using the `roi` and `pointRadius` parameters. It also determines the color of each pixel by using the previous texture. This shader is rendered onto a new texture.
+* Finally, this last texture is passed to the shader rendering the layer.
 
-The size of the computation textures is the size of the rendering texture multiplied by the `framebufferFactor`. This factor can be below 0.5 without any real visual consequences. If the user has defined a region of interest and uses a `framebufferFactor` < 1, visual artifacts appear at the edge of the heatmap. To prevent this, the rendering texture takes the whole screen size if `framebufferFactor` < 1.
+The second and third steps cannot be merged into a single one because of blending. Indeed, blending should not be used in step 2, but it is required to use it in step 3 to see the map below the layer.
+
+The size of the computation textures is the size of the rendering texture multiplied by the `framebufferFactor`. This factor can be below 0.5 without any real visual consequences. If the user has defined a region of interest and uses a `framebufferFactor` < 1, visual artifacts appear at the edge of the layer. To prevent this, the rendering texture takes the whole screen size if `framebufferFactor` < 1.
