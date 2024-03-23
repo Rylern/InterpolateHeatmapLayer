@@ -1,6 +1,7 @@
 import { IDW } from './programs/idw.js';
 import { ROI } from './programs/roi.js';
 import { Draw } from './programs/draw.js';
+import { isWebGL2 } from './webgl-utils.js';
 
 export class InterpolateLayer {
     constructor(options) {
@@ -10,10 +11,7 @@ export class InterpolateLayer {
     init(gl, canvas) {
         this.canvas = canvas;
 
-        if (!gl.getExtension('OES_texture_float') || !gl.getExtension('WEBGL_color_buffer_float') || !gl.getExtension('EXT_float_blend')) {
-            throw("WebGL extension not supported");
-        }
-
+        this.#loadExtensions(gl);
         this.#createPointsDistanceAndAverage();
         this.#setFramebufferSize();
 
@@ -48,6 +46,22 @@ export class InterpolateLayer {
         this.#createPointsDistanceAndAverage();
         this.idw.updatePointsAndDistances(this.points, this.pointsDistance);
         this.roi.updatePointsAndDistances(this.points, this.pointsDistance);
+    }
+
+    #loadExtensions(gl) {
+        const extensions = [];
+
+        if (isWebGL2(gl)) {
+            extensions.push('EXT_color_buffer_float', 'EXT_float_blend');
+        } else {
+            extensions.push('OES_texture_float', 'WEBGL_color_buffer_float', 'EXT_float_blend');
+        }
+
+        for (let extension of extensions) {
+            if (!gl.getExtension(extension)) {
+                throw("WebGL extension " + extension + " not supported");
+            }
+        }
     }
 
     #createPointsDistanceAndAverage() {

@@ -1,3 +1,7 @@
+export function isWebGL2(gl) {
+    return gl.getParameter(gl.VERSION).includes('2.0');
+}
+
 export function createVertexShader(gl, source) {
     const vertexShader = gl.createShader(gl.VERTEX_SHADER);
     return compileShader(gl, vertexShader, source);

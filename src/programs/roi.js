@@ -1,5 +1,5 @@
 import { Matrix } from '../matrix.js';
-import { createVertexShader, createFragmentShader, createProgram } from '../webgl-utils.js';
+import { isWebGL2, createVertexShader, createFragmentShader, createProgram } from '../webgl-utils.js';
 import earcut from 'earcut';
 
 
@@ -25,7 +25,17 @@ export class ROI {
         this.framebufferHeight = framebufferHeight;
 
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.framebufferWidth, this.framebufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
+        this.gl.texImage2D(
+            this.gl.TEXTURE_2D,
+            0,
+            isWebGL2(this.gl) ? this.gl.RGBA32F : this.gl.RGBA,
+            this.framebufferWidth,
+            this.framebufferHeight,
+            0,
+            this.gl.RGBA,
+            this.gl.FLOAT,
+            null
+        );
     }
 
     delete() {
@@ -41,7 +51,17 @@ export class ROI {
         const renderHeight = fullTextureSize ? canvas.height : this.framebufferHeight;
 
         this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, renderWidth, renderHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
+        this.gl.texImage2D(
+            this.gl.TEXTURE_2D,
+            0,
+            isWebGL2(this.gl) ? this.gl.RGBA32F : this.gl.RGBA,
+            renderWidth,
+            renderHeight,
+            0,
+            this.gl.RGBA,
+            this.gl.FLOAT,
+            null
+        );
 
         this.gl.disable(this.gl.BLEND);
         this.gl.disable(this.gl.DEPTH_TEST);
@@ -157,7 +177,17 @@ export class ROI {
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
         this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
-        this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.framebufferWidth, this.framebufferHeight, 0, this.gl.RGBA, this.gl.FLOAT, null);
+        this.gl.texImage2D(
+            this.gl.TEXTURE_2D,
+            0,
+            isWebGL2(this.gl) ? this.gl.RGBA32F : this.gl.RGBA,
+            this.framebufferWidth,
+            this.framebufferHeight,
+            0,
+            this.gl.RGBA,
+            this.gl.FLOAT,
+            null
+        );
         this.gl.bindTexture(this.gl.TEXTURE_2D, null);
     }
 
