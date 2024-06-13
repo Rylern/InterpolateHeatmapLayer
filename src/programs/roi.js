@@ -1,5 +1,6 @@
 import { Matrix } from '../matrix.js';
 import { isWebGL2, createVertexShader, createFragmentShader, createProgram } from '../webgl-utils.js';
+import { MercatorCoordinate } from '../mercator-coordinate.js';
 import earcut from 'earcut';
 
 
@@ -152,7 +153,7 @@ export class ROI {
                 vertices.push(-1.0, -1.0, -1.0, 1.0, 1.0, 1.0, 1.0, -1.0);
             } else {
                 this.options.roi.forEach(roi => {
-                    const coordinates = mapboxgl.MercatorCoordinate.fromLngLat(roi);
+                    const coordinates = new MercatorCoordinate(roi.lat, roi.lon);
                     vertices.push(coordinates.x, coordinates.y);
                 });
             }
