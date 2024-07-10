@@ -1,8 +1,9 @@
 {
   "name": "interpolateheatmaplayer",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "description": "Mapbox layer for average/interpolation heatmaps",
   "main": "dist/interpolateHeatmapLayer.js",
+  "types": "src/index.d.ts",
   "scripts": {
     "build": "webpack"
   },

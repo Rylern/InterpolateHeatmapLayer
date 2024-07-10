@@ -59,6 +59,7 @@ A live demo showing the global temperature is available [here](https://rylern.gi
 
   ```javascript
   const interpolateHeatmapLayer = require('interpolateheatmaplayer');
+  // or: import { create as InterpolateHeatmapLayer } from 'interpolateheatmaplayer';
   
   const map = (window.map = new mapboxgl.Map({
       container: 'map',
@@ -69,6 +70,8 @@ A live demo showing the global temperature is available [here](https://rylern.gi
       const layer = interpolateHeatmapLayer.create({
           // parameters here
       });
+      // or: const layer = InterpolateHeatmapLayer({});
+
       map.addLayer(layer);
   });
   ```

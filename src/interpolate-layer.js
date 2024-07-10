@@ -2,6 +2,7 @@ import { IDW } from './programs/idw.js';
 import { ROI } from './programs/roi.js';
 import { Draw } from './programs/draw.js';
 import { isWebGL2 } from './webgl-utils.js';
+import { MercatorCoordinate  } from './mercator-coordinate.js';
 
 export class InterpolateLayer {
     constructor(options) {
@@ -71,7 +72,7 @@ export class InterpolateLayer {
         let maxValue = -Infinity;
 
         this.options.points.forEach(rawPoint => {
-            const mercatorCoordinates = mapboxgl.MercatorCoordinate.fromLngLat(rawPoint);
+            const mercatorCoordinates = new MercatorCoordinate(rawPoint.lat, rawPoint.lon);
 
             this.points.push([mercatorCoordinates.x, mercatorCoordinates.y, rawPoint.val]);
             this.pointsDistance.push(mercatorCoordinates.meterInMercatorCoordinateUnits() * this.options.pointRadius);
