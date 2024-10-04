@@ -18,6 +18,8 @@ A live demo showing the global temperature is available [here](https://rylern.gi
 
 ## Install
 
+Note that this layer only works if the [Mercator](https://docs.mapbox.com/mapbox-gl-js/guides/projections/#what-projections-are-available) projection is used on the Mapbox map.
+
 * Browser:
 
   * Copy the [interpolateHeatmapLayer.js](https://github.com/Rylern/InterpolateHeatmapLayer/blob/main/dist/interpolateHeatmapLayer.js) file to your project.
