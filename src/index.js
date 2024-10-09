@@ -1,5 +1,12 @@
 import { InterpolateLayer } from './interpolate-layer.js';
 
+
+/**
+ * Create the interpolate heatmap layer with the provided options.
+ * 
+ * @param {InterpolateHeatmapLayerOptions} options the options to customize the appearance of the layer 
+ * @returns {CustomLayerInterface} the interpolate heatmap layer
+ */
 export function create(options) {
     const _options = {
         layerId: '',
@@ -22,7 +29,9 @@ export function create(options) {
             }
         `,
         pointRadius: 0,
-        fasterPointRadius: false
+        fasterPointRadius: false,
+        layerBlendingFactor: WebGLRenderingContext.SRC_ALPHA,
+        mapBlendingFactor: WebGLRenderingContext.ONE_MINUS_SRC_ALPHA
     }
 
     if (typeof options === 'object'){

@@ -1,24 +1,63 @@
+/**
+ * A class representing a 4x4 matrix of Float32 elements.
+ */
 export class Matrix {
+
+    #elements;
+
+    /**
+     * Create the identity matrix.
+     */
     constructor() {
-        this.elements = new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
+        this.#elements = new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,0,1]);
     }
 
+    /**
+     * @returns {Float32Array} a one-dimensional array representing this matrix with the column-major order
+     */
+    getElements() {
+        return this.#elements;
+    }
+
+    /**
+     * Apply a translation to this matrix.
+     * 
+     * @param {number} x the x-component of the translation
+     * @param {number} y the y-component of the translation
+     * @param {number} z the z-component of the translation
+     * @returns {Matrix} this matrix
+     */
     translate(x, y, z) {
-        this.elements[12] += this.elements[0] * x + this.elements[4] * y + this.elements[8]  * z;
-        this.elements[13] += this.elements[1] * x + this.elements[5] * y + this.elements[9]  * z;
-        this.elements[14] += this.elements[2] * x + this.elements[6] * y + this.elements[10] * z;
-        this.elements[15] += this.elements[3] * x + this.elements[7] * y + this.elements[11] * z;
+        this.#elements[12] += this.#elements[0] * x + this.#elements[4] * y + this.#elements[8]  * z;
+        this.#elements[13] += this.#elements[1] * x + this.#elements[5] * y + this.#elements[9]  * z;
+        this.#elements[14] += this.#elements[2] * x + this.#elements[6] * y + this.#elements[10] * z;
+        this.#elements[15] += this.#elements[3] * x + this.#elements[7] * y + this.#elements[11] * z;
         return this;
     }
 
+    /**
+     * Apply a scale to this matrix.
+     * 
+     * @param {number} x the x-component of the scale
+     * @param {number} y the y-component of the scale
+     * @param {number} z the z-component of the scale
+     * @returns {Matrix} this matrix
+     */
     scale(x, y, z) {
-        this.elements[0] *= x;  this.elements[4] *= y;  this.elements[8]  *= z;
-        this.elements[1] *= x;  this.elements[5] *= y;  this.elements[9]  *= z;
-        this.elements[2] *= x;  this.elements[6] *= y;  this.elements[10] *= z;
-        this.elements[3] *= x;  this.elements[7] *= y;  this.elements[11] *= z;
+        this.#elements[0] *= x;  this.#elements[4] *= y;  this.#elements[8]  *= z;
+        this.#elements[1] *= x;  this.#elements[5] *= y;  this.#elements[9]  *= z;
+        this.#elements[2] *= x;  this.#elements[6] *= y;  this.#elements[10] *= z;
+        this.#elements[3] *= x;  this.#elements[7] *= y;  this.#elements[11] *= z;
         return this;
     }
 
+    /**
+     * Compute the dot product between a matrix and a vector.
+     * 
+     * @param {Float32Array} matrix a one-dimensional array representing a 4x4 matrix with the column-major order
+     * @param {Float32Array} vector a one-dimensional array of length 4
+     * @returns {number} the dot product of the provided matrix with the provided vector
+     */
     static dot(matrix, vector) {
         const dotProduct = new Float32Array(4);
         for (let i=0; i<4; i++) {
@@ -27,6 +66,12 @@ export class Matrix {
         return dotProduct;
     }
 
+    /**
+     * Compute the inverse of a matrix
+     * 
+     * @param {Float32Array} matrix a one-dimensional array representing a 4x4 matrix with the column-major order
+     * @returns {Float32Array} a one-dimensional array representing the inverse of the provided matrix with the column-major order
+     */
     static inverse(matrix) {
         const inverse = new Float32Array(16);
         inverse[0] =
