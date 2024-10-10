@@ -41,8 +41,7 @@ export class DrawingProgram {
      * 
      * @param {WebGLRenderingContext | WebGL2RenderingContext} gl the WebGL context to use
      * @param {boolean} areCirclesDrawn whether circles were drawn on the mask
-     * @param {number} opacity the opacity of the layer (between 0 and 1). This parameter may not
-     * be taken into account depending on the values of valueToColor4 and layerBlendingFactor
+     * @param {number} opacity the opacity of the layer (between 0 and 1)
      * @param {string} valueToColor a GLSL function (passed as a string) that maps a value to the
      * layer color. The function must be named valueToColor with a float parameter (which will take
      * values between 0 and 1), and must return a vec3 (with each component between 0 and 1).
