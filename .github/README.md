@@ -150,7 +150,7 @@ The `interpolateHeatmapLayer.create()` function has one object parameter contain
   color = (layerColor * layerBlendingFactor) + (mapColor * mapBlendingFactor)
   ```
 
-  where layerBlendingFactor and mapBlendingFactor are parameters specifiable here.
+  where `layerBlendingFactor` and `mapBlendingFactor` are parameters specifiable here.
 
   A list of possible values of these parameters can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/WebGLRenderingContext/blendFunc#constants):
   * You have to replace `gl` by `WebGLRenderingContext`, for example `WebGLRenderingContext.ZERO`.
