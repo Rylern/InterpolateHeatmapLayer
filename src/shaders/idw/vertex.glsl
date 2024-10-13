@@ -1,6 +1,6 @@
-attribute vec2 a_Position;
-uniform mat4 u_MvpMatrix;
+attribute vec2 position;
+uniform mat4 mvpMatrix;
 
 void main() {
-    gl_Position = u_MvpMatrix * vec4(a_Position, 0.0, 1.0);
+    gl_Position = mvpMatrix * vec4(position, 0.0, 1.0);
 }

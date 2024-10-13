@@ -26,6 +26,8 @@ declare module 'interpolateheatmaplayer' {
         pointRadius?: number;
         fasterPointRadius?: boolean;
         averageThreshold?: number;
+        layerBlendingFactor?: GLenum;
+        mapBlendingFactor?: GLenum;
     }
 
     interface InterpolateHeatmapLayer extends CustomLayerInterface {
