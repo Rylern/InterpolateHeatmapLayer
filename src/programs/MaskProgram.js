@@ -190,7 +190,7 @@ export class MaskProgram {
     #createRoiBuffer() {
         const vertices = [];
         if (this.#roi.length == 0) {
-            vertices.push(1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, -1.0);
+            vertices.push(1.0, 1.0, -1.0, 1.0, -1.0, -1.0, 1.0, -1.0);
         } else {
             for (let roiCoordinate of this.#roi) {
                 vertices.push(roiCoordinate[0], roiCoordinate[1]);
