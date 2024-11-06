@@ -33,7 +33,6 @@ export class IDWProgram {
     #fasterPointRadius;
     #program;
     #position;
-    #mvpMatrix;
     #ui;
     #xi;
     #uP;
@@ -115,7 +114,6 @@ export class IDWProgram {
         this.#gl.viewport(0, 0, this.#framebufferWidth, this.#framebufferHeight);
         this.#gl.clear(this.#gl.COLOR_BUFFER_BIT);
 
-        this.#gl.uniformMatrix4fv(this.#mvpMatrix, false, mvpMatrix);
         this.#gl.uniform1f(this.#uP, this.#p);
         this.#gl.uniform2f(this.#framebufferSize, this.#framebufferWidth, this.#framebufferHeight);
         if (this.#fasterPointRadius) {
@@ -168,7 +166,6 @@ export class IDWProgram {
 
     #createAttributes() {
         this.#position = this.#gl.getAttribLocation(this.#program, 'position');
-        this.#mvpMatrix = this.#gl.getUniformLocation(this.#program, 'mvpMatrix');
 
         this.#ui = this.#gl.getUniformLocation(this.#program, "ui");
         this.#xi = this.#gl.getUniformLocation(this.#program, "xi");
