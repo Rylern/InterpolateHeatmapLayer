@@ -141,7 +141,7 @@ export class InterpolateLayer {
 
         for (let extension of extensions) {
             if (!gl.getExtension(extension)) {
-                throw("WebGL extension " + extension + " not supported");
+                console.error("WebGL extension " + extension + " not supported by this browser. The interpolate heatmap layer might not work properly.");
             }
         }
     }
